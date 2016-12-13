@@ -18,6 +18,7 @@ module.exports = {
                        'one-var': 0,
                        'one-var-declaration-per-line': 0,
                        'no-unused-expressions': 0,
+                       'arrow-body-style': 0,
                    },
                },
             },

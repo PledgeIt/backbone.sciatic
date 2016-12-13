@@ -1,7 +1,5 @@
 import { Events, Model } from 'backbone';
 
-const { extend } = Model;
-
 // A Route is an object that is associated with each URL. When a URL is
 // navigated to, the router transitions into the Route object, calling a
 // series of callbacks.
@@ -37,6 +35,8 @@ Object.assign(Route.prototype, {
         this._router.navigate(...args);
         return this;
     },
-}, Events, { extend });
+}, Events);
+
+Route.extend = Model.extend;
 
 export default Route;

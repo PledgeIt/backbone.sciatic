@@ -3,6 +3,9 @@ import bb from 'backbone';
 import BaseRouter from 'backbone.base-router';
 
 const Router = BaseRouter.extend({
+    // Default to no filters
+    filters: [],
+
     // Providee the ability for a Route to cancel a navigation if it is not fit
     // to be exited. This is useful to ensure that a user does not, for
     // instance, leave a model unsaved.
@@ -52,6 +55,14 @@ const Router = BaseRouter.extend({
 
             // Router "after" filters
             ...this.filters.map(x => x.after),
+
+            // Finally trigger a navigate event on the router & remove reference
+            // to the route-in-progress
+            () => {
+                this.trigger('navigate', routeData);
+                delete this._transitioningTo;
+                return this;
+            },
         ];
 
         // Start the crazy promise chain
@@ -62,14 +73,6 @@ const Router = BaseRouter.extend({
             if (this._transitioningTo !== newRoute) { return; }
             return fn(routeData); // eslint-disable-line consistent-return
         }), Promise.resolve())
-
-            // Finally trigger a navigate event on the router & remove reference
-            // to the route-in-progress
-            .then(() => {
-                this.trigger('navigate', routeData);
-                delete this._transitioningTo;
-                return this;
-            })
 
             // If there are errors at any time, then we look for an `error`
             // method of the Route. If it exists, we execute it; otherwise, we
