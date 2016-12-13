@@ -1,7 +1,7 @@
 {
   "name": "backbone.sciatic",
   "version": "0.1.0",
-  "description": "A Promise-based routing solution for Backbone, with separate Route constructor. Largely infulenced by Backbone.PremiumRouter and Backbone.Blazer",
+  "description": "A Promise-based routing solution for Backbone, with separate Route constructor. Largely influenced by Backbone.PremiumRouter and Backbone.Blazer",
   "main": "src/index.js",
   "directories": {
     "test": "test"
