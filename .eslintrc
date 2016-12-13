@@ -1,0 +1,35 @@
+{
+  "extends": "airbnb",
+  "cache": true,
+  "parser": "babel-eslint",
+  "globals": {
+    "window": true,
+    "sinon": true,
+    "common": true,
+    "expect": true,
+  },
+  "plugins": ["prefer-object-spread"],
+  "env": {
+    "browser": true,
+    "node": true,
+    "mocha": true,
+  },
+  "settings": {
+    "import/resolver": "webpack"
+  },
+  "rules": {
+    "strict": 0,
+    "indent": ["error", 4, { "SwitchCase": 1 }],
+    "max-len": ["error", 120, 0, {
+      "ignoreStrings": true,
+      "ignoreTemplateLiterals": true
+    }],
+    "no-underscore-dangle": 0,
+    "global-require": 0,
+    "class-methods-use-this": 0,
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "import/no-extraneous-dependencies": 0,
+    "import/no-unresolved": 0,
+    "prefer-object-spread/prefer-object-spread": 2
+  }
+}
