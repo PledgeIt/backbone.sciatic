@@ -30,5 +30,29 @@ describe('Router', () => {
             router.navigate('foo', { bar: 'baz' });
             expect(bbNavigate).to.not.have.been.called;
         });
+
+        it('should return the router', () => {
+            const result = router.navigate('foo', { bar: 'baz' });
+            expect(result).to.deep.equal(router);
+        });
+    });
+
+    describe('error', () => {
+        const error = new Error('Test Error');
+
+        let consoleErr;
+        beforeEach(() => { consoleErr = sinon.stub(console, 'error'); });
+        afterEach(() => { consoleErr.restore(); });
+
+        it('should log the error out to the console', () => {
+            router.error(error);
+            expect(consoleErr).to.have.been.calledOnce;
+            expect(consoleErr).to.have.been.calledWithExactly(error);
+        });
+
+        it('should return the router', () => {
+            const result = router.error(error);
+            expect(result).to.deep.equal(router);
+        });
     });
 });

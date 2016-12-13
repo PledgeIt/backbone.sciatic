@@ -23,5 +23,10 @@ describe('Route', () => {
             expect(routerNavigate).to.have.been.calledOnce;
             expect(routerNavigate).to.have.been.calledWithExactly('foo', { bar: 'baz' });
         });
-    })
+
+        it('should return the route', () => {
+            const result = route.navigate('foo', { bar: 'baz' });
+            expect(result).to.deep.equal(route);
+        });
+    });
 });
