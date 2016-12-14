@@ -66,96 +66,217 @@ describe('Router', () => {
             return result;
         });
 
-        describe('during the promise chain', () => {
-            it.skip('should call route.show() after route.fetch() has resolved', () => {
+        describe('without filters', () => {
+            let fetch, show;
 
+            beforeEach(() => {
+                fetch = sinon.spy(RouteA.prototype, 'fetch');
+                show = sinon.spy(RouteA.prototype, 'show');
             });
 
-            it.skip('should update the currentRoute after fetch() has resolved', () => {
-
+            afterEach(() => {
+                fetch.restore();
+                show.restore();
             });
 
-            it.skip('should call router & route before filters in correct order & with correct context', () => {
-
-            });
-
-            it.skip('should call router & route after filters in correct order & with correct context', () => {
-
-            });
-
-            describe('when another route is currently active (but already fulfilled)', () => {
-                let oldRoute;
-
-                beforeEach(() => {
-                    oldRoute = router.currentRoute = new RouteB({ router });
-                    sinon.spy(oldRoute, 'exit');
-                    sinon.spy(RouteA.prototype, 'fetch');
-                    sinon.spy(RouteA.prototype, 'show');
-                });
-
-                afterEach(() => {
-                    oldRoute.exit.restore();
-                    RouteA.prototype.fetch.restore();
-                    RouteA.prototype.show.restore();
-                });
-
-                it('call exit() on currently active route after fetch() and before show()', () => {
-                    return router.onNavigate(routeData).then(() => {
-                        expect(oldRoute.exit).to.have.been.calledOnce;
-                        expect(oldRoute.exit).to.have.been.calledWithExactly();
-                        expect(oldRoute.exit).to.have.been.calledAfter(RouteA.prototype.fetch);
-                        expect(oldRoute.exit).to.have.been.calledBefore(RouteA.prototype.show);
-                    });
+            it('should not call route.show() until after route.fetch() has resolved', () => {
+                return router.onNavigate(routeData).then(() => {
+                    expect(fetch).to.have.been.calledOnce;
+                    expect(show).to.have.been.calledOnce;
+                    expect(show).to.have.been.calledAfter(fetch);
                 });
             });
 
-            describe('when another route is still being fulfilled', () => {
-                let navigate;
-
-                beforeEach(() => {
-                    navigate = sinon.spy();
-                    router.on('navigate', navigate);
-
-                    sinon.stub(RouteB.prototype, 'fetch').returns(new Promise(resolve => setTimeout(resolve, 10000)));
-                    sinon.spy(RouteB.prototype, 'show');
-                    sinon.spy(RouteA.prototype, 'fetch');
-                    sinon.spy(RouteA.prototype, 'show');
+            it('should update the currentRoute after fetch() has resolved', () => {
+                return router.onNavigate(routeData).then(() => {
+                    expect(fetch).to.have.been.calledOnce;
+                    expect(router.currentRoute).to.be.an.instanceOf(RouteA);
                 });
+            });
+        });
 
-                afterEach(() => {
-                    router.off('navigate', navigate);
-                    RouteB.prototype.fetch.restore();
-                    RouteB.prototype.show.restore();
-                    RouteA.prototype.fetch.restore();
-                    RouteA.prototype.show.restore();
+        describe('when filters have been added to the route and/or router', () => {
+            const routerB1 = sinon.stub().resolves();
+            const routerB2 = sinon.stub().resolves();
+            const routeB1 = sinon.stub().resolves();
+            const routeB2 = sinon.stub().resolves();
+            const routerA1 = sinon.stub().resolves();
+            const routerA2 = sinon.stub().resolves();
+            const routeA1 = sinon.stub().resolves();
+            const routeA2 = sinon.stub().resolves();
+            const fetch = sinon.stub().resolves();
+            const show = sinon.stub().resolves();
+
+            const FilterRoute = Route.extend({
+                filters: [
+                    { before: routeB1, after: routeA1 },
+                    { after: routeA2 },
+                    { before: routeB2 },
+                ],
+
+                fetch,
+                show,
+            });
+
+            let navigate, data;
+
+            beforeEach(() => {
+                navigate = sinon.spy();
+                router.on('navigate', navigate);
+
+                data = { ...routeData, linked: FilterRoute };
+
+                router.filters = [
+                    { before: routerB1, after: routerA1 },
+                    { after: routerA2 },
+                    { before: routerB2 },
+                ];
+            });
+
+            afterEach(() => { router.off('navigate', navigate); });
+
+            it('should call filters & lifecycle events in the correct order and with the correct context', () => {
+                return router.onNavigate(data).then(() => {
+                    const current = router.currentRoute;
+                    const expectedData = relevantRouteData(data);
+
+                    expect(current).to.be.an.instanceOf(FilterRoute);
+
+                    expect(routerB1).to.have.been.calledOnce;
+                    expect(routerB1).to.have.been.calledWithExactly(expectedData);
+                    expect(routerB1.firstCall.thisValue).to.deep.equal(router);
+
+                    expect(routerB2).to.have.been.calledOnce;
+                    expect(routerB2).to.have.been.calledWithExactly(expectedData);
+                    expect(routerB2.firstCall.thisValue).to.deep.equal(router);
+                    expect(routerB2).to.have.been.calledAfter(routerB1);
+
+                    expect(routeB1).to.have.been.calledOnce;
+                    expect(routeB1).to.have.been.calledWithExactly(expectedData);
+                    expect(routeB1.firstCall.thisValue).to.deep.equal(current);
+                    expect(routeB1).to.have.been.calledAfter(routerB2);
+
+                    expect(routeB2).to.have.been.calledOnce;
+                    expect(routeB2).to.have.been.calledWithExactly(expectedData);
+                    expect(routeB2.firstCall.thisValue).to.deep.equal(current);
+                    expect(routeB2).to.have.been.calledAfter(routeB1);
+
+                    expect(fetch).to.have.been.calledOnce;
+                    expect(fetch).to.have.been.calledWithExactly(expectedData);
+                    expect(fetch.firstCall.thisValue).to.deep.equal(current);
+                    expect(fetch).to.have.been.calledAfter(routeB2);
+
+                    expect(show).to.have.been.calledOnce;
+                    expect(show).to.have.been.calledWithExactly(expectedData);
+                    expect(show.firstCall.thisValue).to.deep.equal(current);
+                    expect(show).to.have.been.calledAfter(fetch);
+
+                    expect(routeA1).to.have.been.calledOnce;
+                    expect(routeA1).to.have.been.calledWithExactly(expectedData);
+                    expect(routeA1.firstCall.thisValue).to.deep.equal(current);
+                    expect(routeA1).to.have.been.calledAfter(show);
+
+                    expect(routeA2).to.have.been.calledOnce;
+                    expect(routeA2).to.have.been.calledWithExactly(expectedData);
+                    expect(routeA2.firstCall.thisValue).to.deep.equal(current);
+                    expect(routeA2).to.have.been.calledAfter(routeA1);
+
+                    expect(routerA1).to.have.been.calledOnce;
+                    expect(routerA1).to.have.been.calledWithExactly(expectedData);
+                    expect(routerA1.firstCall.thisValue).to.deep.equal(router);
+                    expect(routerA1).to.have.been.calledAfter(routeA2);
+
+                    expect(routerA2).to.have.been.calledOnce;
+                    expect(routerA2).to.have.been.calledWithExactly(expectedData);
+                    expect(routerA2.firstCall.thisValue).to.deep.equal(router);
+                    expect(routerA2).to.have.been.calledAfter(routeA1);
+
+                    expect(navigate).to.have.been.calledOnce;
+                    expect(navigate).to.have.been.calledWithExactly(expectedData);
+                    expect(navigate).to.have.been.calledAfter(routeA2);
                 });
+            });
 
-                it('should not run original route remaining lifecycle methods', (done) => {
-                    const firstData = {
-                        ...routeData,
-                        linked: RouteB,
-                        param: { foo: 'foobar' },
-                    };
+            it('should ultimately resolve with the router', () => {
+                return router.onNavigate(data)
+                    .then(result => expect(result).to.deep.equal(router));
+            });
+        });
 
-                    router.onNavigate(firstData);
+        describe('when another route is currently active (but already fulfilled)', () => {
+            let oldRoute;
 
-                    setTimeout(() => {
-                        router.onNavigate(routeData).then(() => {
-                            expect(RouteB.prototype.fetch).to.have.been.calledOnce;
-                            expect(RouteB.prototype.fetch).to.have.been.calledWithExactly(relevantRouteData(firstData));
-                            expect(RouteB.prototype.show).to.not.have.been.called;
+            beforeEach(() => {
+                oldRoute = router.currentRoute = new RouteB({ router });
+                sinon.spy(oldRoute, 'exit');
+                sinon.spy(RouteA.prototype, 'fetch');
+                sinon.spy(RouteA.prototype, 'show');
+            });
 
-                            expect(RouteA.prototype.fetch).to.have.been.calledOnce;
-                            expect(RouteA.prototype.fetch).to.have.been.calledWithExactly(relevantRouteData(routeData));
-                            expect(RouteA.prototype.show).to.have.been.calledOnce;
-                            expect(RouteA.prototype.show).to.have.been.calledWithExactly(relevantRouteData(routeData));
+            afterEach(() => {
+                oldRoute.exit.restore();
+                RouteA.prototype.fetch.restore();
+                RouteA.prototype.show.restore();
+            });
 
-                            expect(navigate).to.have.been.calledOnce;
-                            expect(navigate).to.have.been.calledWithExactly(relevantRouteData(routeData));
+            it('call exit() on currently active route after fetch() and before show()', () => {
+                return router.onNavigate(routeData).then(() => {
+                    expect(oldRoute.exit).to.have.been.calledOnce;
+                    expect(oldRoute.exit).to.have.been.calledWithExactly();
+                    expect(oldRoute.exit).to.have.been.calledAfter(RouteA.prototype.fetch);
+                    expect(oldRoute.exit).to.have.been.calledBefore(RouteA.prototype.show);
+                });
+            });
+        });
 
-                            done();
-                        });
-                    }, 50);
+        describe('when another route is still being fulfilled', () => {
+            let navigate;
+
+            beforeEach(() => {
+                navigate = sinon.spy();
+                router.on('navigate', navigate);
+
+                sinon.stub(RouteB.prototype, 'fetch').returns(new Promise(resolve => setTimeout(resolve, 100)));
+                sinon.spy(RouteB.prototype, 'show');
+                sinon.spy(RouteA.prototype, 'fetch');
+                sinon.spy(RouteA.prototype, 'show');
+            });
+
+            afterEach(() => {
+                router.off('navigate', navigate);
+                RouteB.prototype.fetch.restore();
+                RouteB.prototype.show.restore();
+                RouteA.prototype.fetch.restore();
+                RouteA.prototype.show.restore();
+            });
+
+            it('should not run original route remaining lifecycle methods', () => {
+                const firstData = {
+                    ...routeData,
+                    linked: RouteB,
+                    param: { foo: 'foobar' },
+                };
+
+                return Promise.all([
+                    router.onNavigate(firstData)
+                        .then(result => expect(result).to.deep.equal(router)),
+
+                    // Need to delay the second navigate call but long
+                    // enough for the first one's fetch() to be called but
+                    // not completed
+                    new Promise(resolve => setTimeout(() => resolve(router.onNavigate(routeData)), 50)),
+                ]).then(() => {
+                    expect(RouteB.prototype.fetch).to.have.been.calledOnce;
+                    expect(RouteB.prototype.fetch).to.have.been.calledWithExactly(relevantRouteData(firstData));
+                    expect(RouteB.prototype.show).to.not.have.been.called;
+
+                    expect(RouteA.prototype.fetch).to.have.been.calledOnce;
+                    expect(RouteA.prototype.fetch).to.have.been.calledWithExactly(relevantRouteData(routeData));
+                    expect(RouteA.prototype.show).to.have.been.calledOnce;
+                    expect(RouteA.prototype.show).to.have.been.calledWithExactly(relevantRouteData(routeData));
+
+                    expect(navigate).to.have.been.calledOnce;
+                    expect(navigate).to.have.been.calledWithExactly(relevantRouteData(routeData));
                 });
             });
         });

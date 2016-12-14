@@ -3,7 +3,7 @@ import Sciatic from '../../src/index';
 import Router from '../../src/router';
 import Route from '../../src/route';
 
-describe('API Access', () => {
+describe('Sciatic', () => {
     it('should expose the Router constructor', () => {
         expect(Sciatic).to.deep.equal(Router);
     });

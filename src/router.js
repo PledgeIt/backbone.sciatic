@@ -30,16 +30,24 @@ const Router = BaseRouter.extend({
         // the user transitions away at a later time.
         this._transitioningTo = newRoute;
 
+        // Convenience method for pulling relevant filters
+        function getFilters(obj, type) {
+            return obj.filters.reduce((arr, filter) => {
+                const fn = filter[type];
+                return fn ? [...arr, fn.bind(obj)] : arr;
+            }, []);
+        }
+
         // Gather filter chains
         const promiseChain = [
             // Router "before" filters
-            ...this.filters.map(x => x.before),
+            ...getFilters(this, 'before'),
 
             // Route "before" filters
-            ...newRoute.filters.map(x => x.before),
+            ...getFilters(newRoute, 'before'),
 
             // Route fetch method
-            newRoute.fetch,
+            newRoute.fetch.bind(newRoute),
 
             // Exit previous route
             () => (this.currentRoute ? this.currentRoute.exit() : undefined),
@@ -48,13 +56,13 @@ const Router = BaseRouter.extend({
             () => { this.currentRoute = newRoute; },
 
             // Route show method
-            newRoute.show,
+            newRoute.show.bind(newRoute),
 
             // Route "after" filters
-            ...newRoute.filters.map(x => x.after),
+            ...getFilters(newRoute, 'after'),
 
             // Router "after" filters
-            ...this.filters.map(x => x.after),
+            ...getFilters(this, 'after'),
 
             // Finally trigger a navigate event on the router & remove reference
             // to the route-in-progress
@@ -70,7 +78,7 @@ const Router = BaseRouter.extend({
             // Anytime the developer has an opportunity to navigate again,
             // we need to check if they have. If they have, then we stop.
             // We need to do this check after every step.
-            if (this._transitioningTo !== newRoute) { return; }
+            if (this._transitioningTo !== newRoute) { return this; }
             return fn(routeData); // eslint-disable-line consistent-return
         }), Promise.resolve())
 
