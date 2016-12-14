@@ -2,3 +2,11 @@ language: node_js
 node_js:
 - stable
 after_script: cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+deploy:
+  provider: npm
+  email: joshlasdindesign@gmail.com
+  api_key:
+    secure: FjK7t5DVrjEVLuEQjfjptsjsNkVJlU+m2C0amCL77PBut0PakJmHE5g10Po5Ev0DyDNBWAOpvHOdKU1rWi/7J7chUyPbrz/WZKLhcXc4dnGt9xWeF6hoEwCF/2K4ntHnb/JbYh5SCtKecSpzo+QTrB+eI08qb7dN2SaVmXJbgl83VYXV9Pb3vRpjHvwbB9zMCqns2nYWmmMhfSnhERFMV/kvODcyTBCU39A9ocfHfbBmE+rpemPGnB+KVwYiRAdB4wfNC4lGe1NnIpqFMcL7637f3igx3/aliEUuBiXpUYLhVM5mz+xeD0TrY370976hH+ZolkgYFVm/swPqJXHVpNX39G8xB+MUPUJLpH2+XNmD+xGyVaxBrwDXmv/W6Ogf8Y8zH+OPt7Uh+7+5d32cRHrt7LNOGXEvDrmtbDzQicvwEDzPr9g6uu389TgILxm7XPs4++RRih9bCgA7afVRTMp7bJC6kagSz/353dQC7P6x2rOkOYc6Kx67p5AQ6leMsRMKCTUJnkEL/roefsLTUbx34+HmgbduIKD6jHJltUSjBCVtUtuXUODSF7leVEVsvEH+8L1DoFOd2nB0W6t0D87pWBFrNWTQsyyYOn39CF8ujYRwHaUzZBcOq1307tC26p9XLmjGZv17lrg89cPqjVJRXbYQsa46XrflKuU77lc=
+  on:
+    tags: true
+    repo: PledgeIt/backbone.sciatic
