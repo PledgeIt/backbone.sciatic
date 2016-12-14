@@ -16,7 +16,7 @@
   "scripts": {
     "minify": "uglifyjs ./dist/backbone.sciatic.js -o ./dist/backbone.sciatic.min.js",
     "build": "rm -rf ./dist/ && webpack ./src/index.js ./dist/backbone.sciatic.js && npm run minify",
-    "transpile": "rm -rf ./lib/ && babel src --out-dir lib",
+    "transpile": "rm -rf ./lib/ && babel src --out-dir lib --presets=es2015,stage-2 --plugins=transform-runtime",
     "test": "rm -rf ./coverage/ && karma start",
     "prepublish": "npm run transpile && npm run build"
   },
