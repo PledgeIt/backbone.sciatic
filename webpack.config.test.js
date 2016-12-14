@@ -37,12 +37,4 @@ module.exports = {
             'arrow-body-style': 0,
         },
     },
-
-    babel: {
-        presets: ['es2015', 'stage-2',],
-        plugins: [
-            ['istanbul', { exclude: ['test/**/*.js'] }],
-            'transform-runtime',
-        ],
-    },
 };
