@@ -29,6 +29,14 @@ module.exports = {
         },
     },
 
+    babel: {
+        presets: ['es2015', 'stage-2'],
+        plugins: [
+            ['istanbul', { exclude: ['test/**/*.js'] }],
+            'transform-runtime',
+        ],
+    },
+
     eslint: {
         rules: {
             'one-var': 0,
