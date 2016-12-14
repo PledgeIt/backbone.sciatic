@@ -1,2 +1,2 @@
-# Backbone.Sciatic
+# Backbone.Sciatic [![Build Status](https://travis-ci.org/PledgeIt/backbone.sciatic.svg?branch=master)](https://travis-ci.org/PledgeIt/backbone.sciatic) [![Coverage Status](https://coveralls.io/repos/github/PledgeIt/backbone.sciatic/badge.svg?branch=master)](https://coveralls.io/github/PledgeIt/backbone.sciatic?branch=master)
 A Promise-based routing solution for Backbone, with separate Route constructor. Largely influenced by Backbone.PremiumRouter and Backbone.Blazer
