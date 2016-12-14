@@ -5,7 +5,7 @@ import Route from '../../src/route';
 
 describe('Sciatic', () => {
     it('should expose the Router constructor', () => {
-        expect(Sciatic).to.deep.equal(Router);
+        expect(Sciatic.Router).to.deep.equal(Router);
     });
 
     it('should expose the Route constructor', () => {
