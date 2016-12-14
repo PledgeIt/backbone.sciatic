@@ -23,7 +23,7 @@ module.exports = {
 
     babel: {
         presets: ['es2015', 'stage-2'],
-        plugins: ['transform-runtime'],
+        plugins: ['add-module-exports', 'transform-runtime'],
     },
 
     devtool: '#source-map',
