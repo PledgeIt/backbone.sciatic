@@ -108,14 +108,20 @@ describe('Router', () => {
             const show = sinon.stub().resolves();
 
             const FilterRoute = Route.extend({
-                filters: [
-                    { before: routeB1, after: routeA1 },
-                    { after: routeA2 },
-                    { before: routeB2 },
-                ],
+                // Return filters inside a function to test _.result()
+                filters() {
+                    return [
+                        { before: routeB1, after: routeA1 },
+                        { after: routeA2 },
+                        { before: routeB2 },
+                        { before: this.routeB3 },
+                    ];
+                },
 
                 fetch,
                 show,
+
+                routeB3: sinon.stub().resolves(),
             });
 
             let navigate, data;
@@ -161,10 +167,15 @@ describe('Router', () => {
                     expect(routeB2.firstCall.thisValue).to.deep.equal(current);
                     expect(routeB2).to.have.been.calledAfter(routeB1);
 
+                    expect(current.routeB3).to.have.been.calledOnce;
+                    expect(current.routeB3).to.have.been.calledWithExactly(expectedData);
+                    expect(current.routeB3.firstCall.thisValue).to.deep.equal(current);
+                    expect(current.routeB3).to.have.been.calledAfter(routeB2);
+
                     expect(fetch).to.have.been.calledOnce;
                     expect(fetch).to.have.been.calledWithExactly(expectedData);
                     expect(fetch.firstCall.thisValue).to.deep.equal(current);
-                    expect(fetch).to.have.been.calledAfter(routeB2);
+                    expect(fetch).to.have.been.calledAfter(current.routeB3);
 
                     expect(show).to.have.been.calledOnce;
                     expect(show).to.have.been.calledWithExactly(expectedData);

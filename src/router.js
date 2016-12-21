@@ -32,7 +32,7 @@ const Router = BaseRouter.extend({
 
         // Convenience method for pulling relevant filters
         function getFilters(obj, type) {
-            return obj.filters.reduce((arr, filter) => {
+            return _.result(obj, 'filters').reduce((arr, filter) => {
                 const fn = filter[type];
                 return fn ? [...arr, fn.bind(obj)] : arr;
             }, []);
