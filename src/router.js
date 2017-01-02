@@ -2,7 +2,7 @@ import _ from 'underscore';
 import bb from 'backbone';
 import BaseRouter from 'backbone.base-router';
 
-export default Router = BaseRouter.extend({
+const Router = BaseRouter.extend({
     // Default to no filters
     filters: [],
 
@@ -100,3 +100,5 @@ export default Router = BaseRouter.extend({
         return this;
     },
 });
+
+export default Router;
