@@ -2,11 +2,11 @@ import _ from 'underscore';
 import bb from 'backbone';
 import BaseRouter from 'backbone.base-router';
 
-const Router = BaseRouter.extend({
+export default Router = BaseRouter.extend({
     // Default to no filters
     filters: [],
 
-    // Providee the ability for a Route to cancel a navigation if it is not fit
+    // Provide the ability for a Route to cancel a navigation if it is not fit
     // to be exited. This is useful to ensure that a user does not, for
     // instance, leave a model unsaved.
     navigate(...args) {
@@ -100,6 +100,3 @@ const Router = BaseRouter.extend({
         return this;
     },
 });
-
-// Export
-export default Router;
