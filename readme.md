@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/PledgeIt/backbone.sciatic.svg?branch=master)](https://travis-ci.org/PledgeIt/backbone.sciatic)
 [![Coverage Status](https://coveralls.io/repos/github/PledgeIt/backbone.sciatic/badge.svg?branch=master)](https://coveralls.io/github/PledgeIt/backbone.sciatic?branch=master)
+[![Dependencies](https://david-dm.org/PledgeIt/backbone.sciatic.svg)](https://david-dm.org/PledgeIt/backbone.sciatic)
+[![Dev-Dependencies](https://david-dm.org/PledgeIt/backbone.sciatic/dev-status.svg)](https://david-dm.org/PledgeIt/backbone.sciatic?type=dev)
 
 Backbone.Sciatic is a Promise-based routing solution for Backbone. This project was largely borrowed/influenced by the fantastic work on [Premium-Router](https://github.com/jmeas/backbone.premium-router) and [Blazer](https://github.com/Betterment/backbone.blazer). Sciatic is built upon [Base-Router](https://github.com/jmeas/backbone.base-router), which extends the native Backbone Router.
 
