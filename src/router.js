@@ -30,6 +30,11 @@ const Router = BaseRouter.extend({
         // the user transitions away at a later time.
         this._transitioningTo = newRoute;
 
+        // Give the route a way to bail out of transitioning even if it isn't
+        // navigating to a new route (which the above would catch)
+        newRoute._bail = false;
+        newRoute.bail = () => { newRoute._bail = true; }
+
         // Convenience method for pulling relevant filters
         function getFilters(obj, type) {
             return _.result(obj, 'filters').reduce((arr, filter) => {
@@ -78,7 +83,9 @@ const Router = BaseRouter.extend({
             // Anytime the developer has an opportunity to navigate again,
             // we need to check if they have. If they have, then we stop.
             // We need to do this check after every step.
-            if (this._transitioningTo !== newRoute) { return this; }
+            if (this._transitioningTo !== newRoute || newRoute._bail) {
+                return this;
+            }
             return fn(routeData); // eslint-disable-line consistent-return
         }), Promise.resolve())
 
