@@ -33,7 +33,7 @@ const Router = BaseRouter.extend({
         // Give the route a way to bail out of transitioning even if it isn't
         // navigating to a new route (which the above would catch)
         newRoute._bail = false;
-        newRoute.bail = () => { newRoute._bail = true; }
+        newRoute.bail = () => { newRoute._bail = true; };
 
         // Convenience method for pulling relevant filters
         function getFilters(obj, type) {
