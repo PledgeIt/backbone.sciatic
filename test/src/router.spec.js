@@ -293,22 +293,24 @@ describe('Router', () => {
         });
 
         describe('when the route bails out', () => {
-            const spy1 = sinon.spy();
-            const spy2 = sinon.spy();
+            it('should not continue running the chain', () => {
+                const spy1 = sinon.spy();
+                const spy2 = sinon.spy();
 
-            const BailRoute = Route.extend({
-                fetch() {
-                    spy1();
-                    this.bail();
-                },
-                show() { spy2(); },
-            });
+                const BailRoute = Route.extend({
+                    fetch() {
+                        spy1();
+                        this.bail();
+                    },
+                    show() { spy2(); },
+                });
 
-            routeData.linked = BailRoute;
+                routeData.linked = BailRoute;
 
-            return router.onNavigate(routeData).then(() => {
-                expect(spy1).to.have.callCount(1);
-                expect(spy2).to.have.callCount(0);
+                return router.onNavigate(routeData).then(() => {
+                    expect(spy1).to.have.callCount(1);
+                    expect(spy2).to.have.callCount(0);
+                });
             });
         });
 
